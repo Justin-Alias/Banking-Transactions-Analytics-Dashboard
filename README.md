@@ -199,11 +199,3 @@ Power BI Dashboard
 
 Reporting & Publishing
 
----
-
-## Future Improvements
-
-- Add incremental refresh
-- Add DAX measures
-- Add forecasting visuals
-- Deploy via Power BI Service
