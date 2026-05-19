@@ -110,11 +110,10 @@ Dashboard KPIs include:
 
 ---
 
-## Dashboard Preview
-
-### Main Dashboard
+### Dashboards
 
 ![Dashboard](Dashboard1.png)
+![Dashboard](Dashboard2.png)
 
 ### Power Query Cleaning
 
