@@ -1,193 +1,194 @@
-# Banking Transactions Analytics Dashboard (Power BI + SQL Server)
+# 🏦 Banking Transactions — Data Cleaning & Analytics Dashboard
 
-## Project Overview
+<div align="center">
 
-This project demonstrates an end-to-end Business Intelligence workflow using SQL Server and Power BI.
+![SQL Server](https://img.shields.io/badge/SQL_Server-CC2927?style=for-the-badge&logo=microsoft-sql-server&logoColor=white)
+![T-SQL](https://img.shields.io/badge/T--SQL-4479A1?style=for-the-badge&logo=databricks&logoColor=white)
+![Power BI](https://img.shields.io/badge/Power_BI-F2C811?style=for-the-badge&logo=powerbi&logoColor=black)
+![Power Query](https://img.shields.io/badge/Power_Query-217346?style=for-the-badge&logo=microsoft-excel&logoColor=white)
 
-The objective was to create a banking transaction analytics solution by generating, cleaning, transforming, and visualizing transaction data.
+*End-to-end pipeline from synthetic dirty data generation → SQL cleaning → Power BI reporting.*
 
-The project includes:
-
-- Synthetic banking dataset generation (10,000+ records)
-- SQL Server database creation
-- Data cleaning and transformation
-- Power Query preprocessing
-- Interactive Power BI dashboard creation
+</div>
 
 ---
 
-## Tech Stack
+## 📋 Project Overview
 
-- SQL Server Management Studio (SSMS)
-- SQL
-- Power BI
-- Power Query
-- DAX
+This project simulates a real-world banking data pipeline using **10,000 AI-generated synthetic transaction records** intentionally loaded with data quality issues. The goal: clean, transform, and join the data in SQL Server, then build an analytics dashboard in Power BI.
 
----
-
-## Dataset
-
-The dataset contains:
-
-### Customers Table
-- Customer ID
-- Name
-- Gender
-- Date of Birth
-- Contact information
-
-### Accounts Table
-- Account Type
-- Opening Date
-- Balance
-
-### Transactions Table
-10,000+ synthetic records including:
-
-- Credits / Debits
-- Transaction dates
-- Account relationships
-- Currency information
-- Intentional data quality issues
-
-Examples of introduced issues:
-
-- Duplicate records
-- Null values
-- Mixed date formats
-- Invalid references
-- Case inconsistencies
-- Outlier transactions
+| Phase | Tool | Description |
+|---|---|---|
+| 🤖 Data Generation | Perplexity AI | Generated 10,000 synthetic banking transactions with intentional data issues |
+| 🗄️ Database Setup | SQL Server Management Studio | Created `Power_BI2` database with three relational tables |
+| 🧹 Data Cleaning | T-SQL | Standardized dates, fixed casing, removed nulls and outliers |
+| 🔗 Data Integration | T-SQL (`LEFT JOIN`) | Joined Transactions, Accounts, and Customers into a combined reporting table |
+| 🔧 Final Prep | Power Query Editor | Resolved remaining type, null, and duplicate issues |
+| 📊 Reporting | Power BI | Built and published the analytics dashboard |
 
 ---
 
-## Data Cleaning Process
+## 🗄️ Database Schema
 
-### SQL Layer
+The `Power_BI2` database contains three tables, each intentionally seeded with data quality issues to simulate realistic dirty data scenarios.
 
-Performed:
+### `Customers`
+| Column | Type | Notes |
+|---|---|---|
+| `CustomerID` | INT (PK) | Unique customer identifier |
+| `Name` | NVARCHAR(100) | Inconsistent casing in raw data |
+| `Gender` | VARCHAR(10) | Nullable; some records missing |
+| `DateOfBirth` | VARCHAR(20) | Mixed date formats (`yyyy-MM-dd`, `dd-MM-yyyy`, `yyyy/MM/dd`) |
+| `Address` | NVARCHAR(200) | Nullable; some empty strings |
+| `Email` | NVARCHAR(100) | Nullable |
+| `Phone` | VARCHAR(20) | — |
+| `AccountID` | INT | Soft reference; not a true FK |
 
-✔ Database creation
+### `Accounts`
+| Column | Type | Notes |
+|---|---|---|
+| `AccountID` | INT (PK) | Unique account identifier |
+| `CustomerID` | INT | Soft reference; includes orphaned records |
+| `Type` | NVARCHAR(20) | Inconsistent casing (`SAVINGS`, `Savings`, `current`) |
+| `OpenDate` | VARCHAR(20) | Mixed date formats |
+| `Balance` | DECIMAL(18,2) | Includes negative and zero outlier balances |
 
-✔ Table creation
-
-✔ Synthetic transaction generation
-
-✔ Data issue simulation
-
-Examples:
-
-- Invalid Account IDs
-- Outlier balances
-- Missing descriptions
-- Mixed date formats
-
----
-
-### Power Query Transformations
-
-Inside Power BI:
-
-- Removed duplicates
-- Replaced null values
-- Standardized date formats
-- Corrected datatypes
-- Built cleaned combined table
-
----
-
-## Dashboard Features
-
-Dashboard KPIs include:
-
-- Total Transactions
-- Credits vs Debits
-- Account Distribution
-- Transaction Trends
-- Customer Insights
-- Balance Analysis
+### `Transactions`
+| Column | Type | Notes |
+|---|---|---|
+| `TransactionID` | INT | No PK enforced — duplicates allowed for demo |
+| `AccountID` | INT | Some mismatched/orphaned IDs (`9999`) |
+| `TransactionDate` | VARCHAR(20) | Mixed date formats |
+| `Type` | VARCHAR(20) | Inconsistent casing (`Credit`, `DEBIT`) |
+| `Amount` | DECIMAL(18,2) | Includes negative outliers (`-99,999.99`) and extreme positives (`1,000,000.99`) |
+| `Description` | NVARCHAR(200) | ~2% NULL; inconsistent casing |
+| `Currency` | VARCHAR(10) | Mixed casing (`USD`, `usd`, `INR`) |
 
 ---
 
-### Dashboards
+## 🧹 Data Cleaning Workflow
 
-![Dashboard](Dashboard1.png)
-![Dashboard](Dashboard2.png)
+### Issue 1 — Mixed Date Formats
 
----
-
-## SQL Example
+All three tables stored dates as `VARCHAR` with multiple inconsistent formats. A `TRY_CONVERT` cascade was used to detect and standardize every date to `MM/dd/yyyy`:
 
 ```sql
-create database Power_BI2
-
-use Power_BI2
-
--- Drop tables if they exist (order due to FK dependencies)
-IF OBJECT_ID('Transactions', 'U') IS NOT NULL DROP TABLE Transactions;
-IF OBJECT_ID('Accounts', 'U') IS NOT NULL DROP TABLE Accounts;
-IF OBJECT_ID('Customers', 'U') IS NOT NULL DROP TABLE Customers;
-
--- Customers Table
-CREATE TABLE Customers (
-    CustomerID     INT PRIMARY KEY,
-    Name           NVARCHAR(100),
-    Gender         VARCHAR(10) NULL,
-    DateOfBirth    VARCHAR(20),          -- to allow mixed formats
-    Address        NVARCHAR(200) NULL,
-    Email          NVARCHAR(100) NULL,
-    Phone          VARCHAR(20),
-    AccountID      INT                   -- Not a true FK: dirty data test
-);
-
--- Accounts Table
-CREATE TABLE Accounts (
-    AccountID   INT PRIMARY KEY,
-    CustomerID  INT,                     -- Not a strict FK: allow mismatches
-    Type        NVARCHAR(20),
-    OpenDate    VARCHAR(20),             -- for mixed formats
-    Balance     DECIMAL(18,2)
-);
-
--- Transactions Table
-CREATE TABLE Transactions (
-    TransactionID    INT,
-    AccountID        INT,                -- Can be mismatched for demo
-    TransactionDate  VARCHAR(20),        -- Allow mixed formats
-    Type             VARCHAR(20),
-    Amount           DECIMAL(18,2),
-    Description      NVARCHAR(200) NULL,
-    Currency         VARCHAR(10),
-
-    -- Not enforcing PK to allow duplicates
-);
-
+UPDATE Transactions
+SET TransactionDate = 
+    CASE
+        WHEN TRY_CONVERT(date, TransactionDate, 101) IS NOT NULL  -- MM/DD/YYYY
+            THEN FORMAT(TRY_CONVERT(date, TransactionDate, 101), 'MM/dd/yyyy')
+        WHEN TRY_CONVERT(date, TransactionDate, 23)  IS NOT NULL  -- YYYY-MM-DD
+            THEN FORMAT(TRY_CONVERT(date, TransactionDate, 23),  'MM/dd/yyyy')
+        WHEN TRY_CONVERT(date, TransactionDate, 111) IS NOT NULL  -- YYYY/MM/DD
+            THEN FORMAT(TRY_CONVERT(date, TransactionDate, 111), 'MM/dd/yyyy')
+        WHEN TRY_CONVERT(date, TransactionDate, 105) IS NOT NULL  -- DD-MM-YYYY
+            THEN FORMAT(TRY_CONVERT(date, TransactionDate, 105), 'MM/dd/yyyy')
+        WHEN TRY_CONVERT(date, TransactionDate, 103) IS NOT NULL  -- DD/MM/YYYY
+            THEN FORMAT(TRY_CONVERT(date, TransactionDate, 103), 'MM/dd/yyyy')
+        ELSE TransactionDate  -- leave unparseable values in place
+    END;
 ```
+
+Applied to: `Transactions.TransactionDate`, `Accounts.OpenDate`, `Customers.DateOfBirth`
 
 ---
 
-## Project Workflow
+### Issue 2 — Synthetic Data Quality Problems (by design)
 
-Dataset Generation
+The 10,000-row transaction dataset was generated with the following intentional flaws:
 
-        ↓
+| Issue | Example | Frequency |
+|---|---|---|
+| Orphaned AccountIDs | `AccountID = 9999` | Every 20th row |
+| Mixed date formats | `yyyy/MM/dd` vs `dd-MM-yyyy` | Every 3rd row alternates |
+| Inconsistent Type casing | `'Credit'` vs `'DEBIT'` | Alternating rows |
+| Negative amount outliers | `-99,999.99` | Every 1,000th row |
+| Positive amount outliers | `1,000,000.99` | Every 250th row |
+| NULL descriptions | `NULL` | Every 50th row |
+| Mixed currency casing | `'usd'` vs `'USD'` vs `'INR'` | Every 3rd / 5th row |
 
-SQL Database Creation
+---
 
-        ↓
+## 🔗 Data Integration — Combined Reporting Table
 
-Data Cleaning
+After cleaning, all three tables were joined via `LEFT JOIN` and exported into a single flat reporting table (`CombinedBankingDataset`) for Power BI:
 
-        ↓
+```sql
+SELECT
+    t.TransactionID,
+    t.AccountID        AS Transaction_AccountID,
+    t.TransactionDate,
+    t.Type             AS TransactionType,
+    t.Amount,
+    t.Description,
+    t.Currency,
+    a.AccountID        AS Account_AccountID,
+    a.CustomerID       AS Account_CustomerID,
+    a.Type             AS AccountType,
+    a.OpenDate,
+    a.Balance,
+    c.CustomerID,
+    c.Name,
+    c.Gender,
+    c.DateOfBirth,
+    c.Address,
+    c.Email,
+    c.Phone
+INTO CombinedBankingDataset
+FROM      Transactions t
+LEFT JOIN Accounts     a ON t.AccountID  = a.AccountID
+LEFT JOIN Customers    c ON a.CustomerID = c.CustomerID;
+```
 
-Power Query Transformation
+> `LEFT JOIN` was used throughout to preserve all transaction records, including those with orphaned or mismatched account/customer references.
 
-        ↓
+---
 
-Power BI Dashboard
+## 🔧 Power Query Transformations
 
-        ↓
+After importing `CombinedBankingDataset` into Power BI, the following final transformations were applied in the Power Query Editor:
 
-Reporting & Publishing
+| Task | Action |
+|---|---|
+| Null values | Replaced with appropriate defaults or flagged |
+| Duplicate records | Identified and removed |
+| Data types | Assigned correct types to all columns (date, decimal, text) |
+| Report preparation | Final column renaming and formatting for dashboard readiness |
 
+---
+
+## 📊 Dashboard
+
+The published Power BI report (`Project 5 Dashboard.pbix`) visualizes the cleaned and joined banking dataset, providing insights across transactions, account activity, and customer segments.
+
+> 📁 See `Project 5 Dashboard.pbix` for the full interactive report.
+
+---
+
+## 📁 Project Files
+
+| File | Description |
+|---|---|
+| `SQLQuery.sql` | Full SQL script — schema creation, data seeding, cleaning, and JOIN |
+| `SQL_Query.txt` | Alternate version of the SQL script with table drop guards |
+| `Project 5 Dashboard.pbix` | Power BI report file |
+| `Project 5. Walkthrough.txt` | High-level project summary |
+
+---
+
+## 🛠️ Technologies
+
+| Tool | Purpose |
+|---|---|
+| **SQL Server Management Studio (SSMS)** | Database creation, data loading, and T-SQL execution |
+| **T-SQL** | Schema design, synthetic data generation, cleaning, and JOIN logic |
+| **Power BI Desktop** | Dashboard creation and publishing |
+| **Power Query Editor** | Final in-report data transformation and type assignment |
+| **Perplexity AI** | Synthetic dataset generation (10,000 transaction rows) |
+
+---
+
+<div align="center">
+<sub>Built to demonstrate end-to-end data engineering — from intentionally dirty synthetic data to a clean, publishable analytics report.</sub>
+</div>
