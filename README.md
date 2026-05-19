@@ -114,7 +114,7 @@ Dashboard KPIs include:
 
 ### Main Dashboard
 
-![Dashboard](screenshots/Dashboard1.png)
+![Dashboard](Dashboard1.png)
 
 ### Power Query Cleaning
 
