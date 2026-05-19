@@ -1,4 +1,4 @@
-# 🏦 Banking Transactions — Data Cleaning & Analytics Dashboard
+# 🏦 Banking Transactions - Data Cleaning & Analytics Dashboard
 
 <div align="center">
 
