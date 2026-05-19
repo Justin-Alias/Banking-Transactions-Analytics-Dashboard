@@ -115,14 +115,6 @@ Dashboard KPIs include:
 ![Dashboard](Dashboard1.png)
 ![Dashboard](Dashboard2.png)
 
-### Power Query Cleaning
-
-![Cleaning](screenshots/power-query-cleaning.png)
-
-### Data Model
-
-![Model](screenshots/model-view.png)
-
 ---
 
 ## SQL Example
