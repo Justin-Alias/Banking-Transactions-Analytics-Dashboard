@@ -13,26 +13,33 @@
 
 ---
 
-## 📋 Project Overview
+## Project Overview
 
 This project simulates a real-world banking data pipeline using **10,000 AI-generated synthetic transaction records** intentionally loaded with data quality issues. The goal: clean, transform, and join the data in SQL Server, then build an analytics dashboard in Power BI.
 
+<div align="center">
+
 | Phase | Tool | Description |
 |---|---|---|
-| 🤖 Data Generation | Perplexity AI | Generated 10,000 synthetic banking transactions with intentional data issues |
-| 🗄️ Database Setup | SQL Server Management Studio | Created `Power_BI2` database with three relational tables |
-| 🧹 Data Cleaning | T-SQL | Standardized dates, fixed casing, removed nulls and outliers |
-| 🔗 Data Integration | T-SQL (`LEFT JOIN`) | Joined Transactions, Accounts, and Customers into a combined reporting table |
-| 🔧 Final Prep | Power Query Editor | Resolved remaining type, null, and duplicate issues |
-| 📊 Reporting | Power BI | Built and published the analytics dashboard |
+| Data Generation | Perplexity AI | Generated 10,000 synthetic banking transactions with intentional data issues |
+| Database Setup | SQL Server Management Studio | Created `Power_BI2` database with three relational tables |
+| Data Cleaning | T-SQL | Standardized dates, fixed casing, removed nulls and outliers |
+| Data Integration | T-SQL (`LEFT JOIN`) | Joined Transactions, Accounts, and Customers into a combined reporting table |
+| Final Prep | Power Query Editor | Resolved remaining type, null, and duplicate issues |
+| Reporting | Power BI | Built and published the analytics dashboard |
+
+</div>
 
 ---
 
-## 🗄️ Database Schema
+## Database Schema
 
 The `Power_BI2` database contains three tables, each intentionally seeded with data quality issues to simulate realistic dirty data scenarios.
 
 ### `Customers`
+
+<div align="center">
+
 | Column | Type | Notes |
 |---|---|---|
 | `CustomerID` | INT (PK) | Unique customer identifier |
@@ -44,7 +51,12 @@ The `Power_BI2` database contains three tables, each intentionally seeded with d
 | `Phone` | VARCHAR(20) | — |
 | `AccountID` | INT | Soft reference; not a true FK |
 
+</div>
+
 ### `Accounts`
+
+<div align="center">
+
 | Column | Type | Notes |
 |---|---|---|
 | `AccountID` | INT (PK) | Unique account identifier |
@@ -53,7 +65,12 @@ The `Power_BI2` database contains three tables, each intentionally seeded with d
 | `OpenDate` | VARCHAR(20) | Mixed date formats |
 | `Balance` | DECIMAL(18,2) | Includes negative and zero outlier balances |
 
+</div>
+
 ### `Transactions`
+
+<div align="center">
+
 | Column | Type | Notes |
 |---|---|---|
 | `TransactionID` | INT | No PK enforced — duplicates allowed for demo |
@@ -64,9 +81,11 @@ The `Power_BI2` database contains three tables, each intentionally seeded with d
 | `Description` | NVARCHAR(200) | ~2% NULL; inconsistent casing |
 | `Currency` | VARCHAR(10) | Mixed casing (`USD`, `usd`, `INR`) |
 
+</div>
+
 ---
 
-## 🧹 Data Cleaning Workflow
+## Data Cleaning Workflow
 
 ### Issue 1 — Mixed Date Formats
 
@@ -98,6 +117,8 @@ Applied to: `Transactions.TransactionDate`, `Accounts.OpenDate`, `Customers.Date
 
 The 10,000-row transaction dataset was generated with the following intentional flaws:
 
+<div align="center">
+
 | Issue | Example | Frequency |
 |---|---|---|
 | Orphaned AccountIDs | `AccountID = 9999` | Every 20th row |
@@ -108,9 +129,11 @@ The 10,000-row transaction dataset was generated with the following intentional 
 | NULL descriptions | `NULL` | Every 50th row |
 | Mixed currency casing | `'usd'` vs `'USD'` vs `'INR'` | Every 3rd / 5th row |
 
+</div>
+
 ---
 
-## 🔗 Data Integration — Combined Reporting Table
+## Data Integration — Combined Reporting Table
 
 After cleaning, all three tables were joined via `LEFT JOIN` and exported into a single flat reporting table (`CombinedBankingDataset`) for Power BI:
 
@@ -145,9 +168,11 @@ LEFT JOIN Customers    c ON a.CustomerID = c.CustomerID;
 
 ---
 
-## 🔧 Power Query Transformations
+## Power Query Transformations
 
 After importing `CombinedBankingDataset` into Power BI, the following final transformations were applied in the Power Query Editor:
+
+<div align="center">
 
 | Task | Action |
 |---|---|
@@ -156,17 +181,21 @@ After importing `CombinedBankingDataset` into Power BI, the following final tran
 | Data types | Assigned correct types to all columns (date, decimal, text) |
 | Report preparation | Final column renaming and formatting for dashboard readiness |
 
+</div>
+
 ---
 
-## 📊 Dashboard
+## Dashboard
 
 The published Power BI report (`Project 5 Dashboard.pbix`) visualizes the cleaned and joined banking dataset, providing insights across transactions, account activity, and customer segments.
 
-> 📁 See `Project 5 Dashboard.pbix` for the full interactive report.
+> See `Project 5 Dashboard.pbix` for the full interactive report.
 
 ---
 
-## 📁 Project Files
+## Project Files
+
+<div align="center">
 
 | File | Description |
 |---|---|
@@ -175,9 +204,13 @@ The published Power BI report (`Project 5 Dashboard.pbix`) visualizes the cleane
 | `Project 5 Dashboard.pbix` | Power BI report file |
 | `Project 5. Walkthrough.txt` | High-level project summary |
 
+</div>
+
 ---
 
-## 🛠️ Technologies
+## Technologies
+
+<div align="center">
 
 | Tool | Purpose |
 |---|---|
@@ -186,6 +219,8 @@ The published Power BI report (`Project 5 Dashboard.pbix`) visualizes the cleane
 | **Power BI Desktop** | Dashboard creation and publishing |
 | **Power Query Editor** | Final in-report data transformation and type assignment |
 | **Perplexity AI** | Synthetic dataset generation (10,000 transaction rows) |
+
+</div>
 
 ---
 
