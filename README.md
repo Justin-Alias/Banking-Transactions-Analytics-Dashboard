@@ -225,5 +225,5 @@ The published Power BI report (`Project 5 Dashboard.pbix`) visualizes the cleane
 ---
 
 <div align="center">
-<sub>Built to demonstrate end-to-end data engineering — from intentionally dirty synthetic data to a clean, publishable analytics report.</sub>
+<sub>Built to demonstrate end-to-end data engineering - from intentionally dirty synthetic data to a clean, publishable analytics report.</sub>
 </div>
